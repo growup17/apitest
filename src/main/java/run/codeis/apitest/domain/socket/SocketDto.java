@@ -10,6 +10,8 @@ import lombok.Data;
 public class SocketDto {
 	private String ip;
 	private Integer port;
+	private Integer parallelNum = 1;
 	private String request;
 	private String response;
+	private long spendTime;
 }

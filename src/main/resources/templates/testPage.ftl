@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>测试页面</title>
+    <title>socket测试</title>
     <link rel="stylesheet" type="text/css" href="">
     <script src="/react.development.js"></script>
     <script src="/react-dom.development.js"></script>
@@ -17,11 +17,13 @@
             <input type="text" name="ip" value=""/>
             <span>端口：</span>
             <input type="text" name="port" value=""/>
+            <span>并行数：</span>
+            <input type="text" name="parallelNum" value="1"/>
         </div>
         <div>
             <span>请求：</span>
             <textarea cols="80" rows="26" name="request"></textarea>
-            <input type="button" value="提交" onclick="sendRequest()">
+            <input type="button" value="发送" onclick="sendRequest()">
         </div>
         <div>
 
@@ -35,16 +37,21 @@
 </div>
 <script>
     function sendRequest() {
+        $("#response").val("");
         $.ajax({
             type: "POST",
             dataType: "json",
             url: "/doSocket",
             data: $("#socketTestForm").serialize(),
             success: function (result) {
-                $("#response").text(JSON.stringify(result.response));
+                for (let i = 0; i < result.length; i++) {
+                    let item = "------结果" + i + "耗时：" + result[i].spendTime + "------\n";
+                    item = item + result[i].response + "\n";
+                    $("#response").val($("#response").val() + item)
+                }
             },
-            error: function () {
-
+            error: function (result) {
+                $("#response").val(result);
             }
         });
     }

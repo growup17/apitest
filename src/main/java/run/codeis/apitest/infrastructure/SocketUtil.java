@@ -15,15 +15,20 @@ import java.nio.charset.StandardCharsets;
 public class SocketUtil {
 
 
-	public static SocketDto doSocket(SocketDto socketDto) throws IOException {
-		Socket socket = new Socket(socketDto.getIp(), socketDto.getPort());
-		//发送数据
-		write(socket, socketDto.getRequest());
-		//socket.shutdownOutput();
-
-		String resp = read(socket);
-		socket.shutdownInput();
-		socketDto.setResponse(resp);
+	public static SocketDto doSocket(SocketDto socketDto) {
+		long begin = System.currentTimeMillis();
+		try (Socket socket = new Socket(socketDto.getIp(), socketDto.getPort())) {
+			log.info("socket接口测试，远程地址={}:{}，本地地址={}:{}", socket.getInetAddress().getHostAddress(), socket.getPort(), socket.getLocalAddress().getHostAddress(), socket.getLocalPort());
+			//发送数据
+			write(socket, socketDto.getRequest());
+			//读取数据
+			String resp = read(socket);
+			socketDto.setResponse(resp);
+		} catch (Exception e) {
+			log.error("", e);
+			socketDto.setResponse(e.toString());
+		}
+		socketDto.setSpendTime(System.currentTimeMillis() - begin);
 		return socketDto;
 	}
 
@@ -43,11 +48,8 @@ public class SocketUtil {
 	private static String read(Socket socket) {
 		log.info("开始读取socket输入数据");
 		StringBuilder inputStr = new StringBuilder();
-		try {
+		try (InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8); BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 			socket.setSoTimeout(10000);
-			//关闭inputStreamReader、bufferedReader后，后面返回报Socket is closed
-			InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
-			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 			String line = null;
 			log.info("读取socket输入数据：bufferedReader.ready()={}", bufferedReader.ready());
 			//等待读取准备好

@@ -8,6 +8,7 @@ import run.codeis.apitest.application.SocketService;
 import run.codeis.apitest.domain.socket.SocketDto;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 提供测试接口
@@ -28,7 +29,7 @@ public class ApiController {
 
 	@ResponseBody
 	@RequestMapping("/doSocket")
-	public SocketDto doSocket(SocketDto socketDto) throws IOException {
+	public List<SocketDto> doSocket(SocketDto socketDto) throws InterruptedException {
 		return socketService.doSocket(socketDto);
 	}
 }
