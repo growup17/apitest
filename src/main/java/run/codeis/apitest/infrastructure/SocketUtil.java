@@ -17,8 +17,12 @@ public class SocketUtil {
 
 	public static SocketDto doSocket(SocketDto socketDto) {
 		long begin = System.currentTimeMillis();
-		try (Socket socket = new Socket(socketDto.getIp(), socketDto.getPort())) {
-			log.info("socket接口测试，远程地址={}:{}，本地地址={}:{}", socket.getInetAddress().getHostAddress(), socket.getPort(), socket.getLocalAddress().getHostAddress(), socket.getLocalPort());
+		socketDto.setThreadName(Thread.currentThread().getName());
+		try (Socket socket = new Socket(socketDto.getServerIp(), socketDto.getServerPort())) {
+			String connectionInfo = String.format("远程地址=%s:%s，本地地址=%s:%s", socket.getInetAddress().getHostAddress(), socket.getPort(), socket.getLocalAddress().getHostAddress(), socket.getLocalPort());
+			socketDto.setConnectionInfo(connectionInfo);
+			log.info(connectionInfo);
+			socket.setSoTimeout(socketDto.getReadTimeout());
 			//发送数据
 			write(socket, socketDto.getRequest());
 			//读取数据
@@ -49,7 +53,6 @@ public class SocketUtil {
 		log.info("开始读取socket输入数据");
 		StringBuilder inputStr = new StringBuilder();
 		try (InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8); BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-			socket.setSoTimeout(10000);
 			String line = null;
 			log.info("读取socket输入数据：bufferedReader.ready()={}", bufferedReader.ready());
 			//等待读取准备好

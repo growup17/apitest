@@ -9,6 +9,7 @@ import run.codeis.apitest.domain.socket.SocketDto;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 提供测试接口
@@ -29,7 +30,7 @@ public class ApiController {
 
 	@ResponseBody
 	@RequestMapping("/doSocket")
-	public List<SocketDto> doSocket(SocketDto socketDto) throws InterruptedException {
+	public List<SocketDto> doSocket(SocketDto socketDto) throws InterruptedException, ExecutionException {
 		return socketService.doSocket(socketDto);
 	}
 }
